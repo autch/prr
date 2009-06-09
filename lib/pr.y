@@ -24,11 +24,11 @@ rule
   | call_stmt
   | assign
   | select_case
-  | case                          
-  | if                         
-  | elseif                        
-  | else                          
-  | for                         
+  | case
+  | if
+  | elseif
+  | else
+  | for
   | foreach
   | do
   | do_while
@@ -45,7 +45,7 @@ rule
   | END_SELECT                  { result = "end" }
   | END_SUB                        { result = "end" }
   | END_FUNCTION                  { result = "_prr_result\r\nend"}
-    
+
   if: IF expr                 { result = "if " + val[1] + " then" }
   select_case: SELECT_CASE expr           { result = "case " + val[1]}
   else: ELSE                               { result = "else"}
