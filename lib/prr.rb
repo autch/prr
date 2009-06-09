@@ -8,16 +8,14 @@ parser = PlayRiteParser.new
 
 buf = ""
 while line = ARGF.gets do
-  buf << line.strip
+  buf << line.chomp
   while /\\\\$/ =~ buf do
     line = ARGF.gets
     break unless line
     buf.gsub!(/\\\\$/, '')
-    buf << line.strip
+    buf << line.chomp
   end
   r = parser.parse(buf)
-  p(r) if r
+  puts r if r
   buf = ""
 end
-
-parser.dump_vars
