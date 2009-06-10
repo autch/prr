@@ -22,7 +22,7 @@ class PlayRiteScanner
     ['>=', :GE], ['<=', :LE], ['<>', :NE, '!='], ['=', :EQ, '=='], ['<', :LT], ['>', :GT],
     ['and', :AND, '&&'], ['or', :OR, '||'], ['xor', :XOR, '^'], ['not', :NOT, '!'],
     ['mod', :MOD, '%'],
-    ['*', :MUL], ['/', :DIV], ['+', :ADD], ['&', :CAT], ['-', :SUB]
+    ['*', :MUL], ['/', :DIV], ['+', :ADD], ['&', :CAT, '+'], ['-', :SUB]
   ]
 
   def initialize

@@ -1,5 +1,5 @@
 require "pr.tab.rb"
-require "playrite_scanner.rb"
+require 'playrite_scanner.rb'
 
 class PlayRiteParser
   def initialize
