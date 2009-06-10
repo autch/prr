@@ -107,6 +107,8 @@
 #                                                    #
 ######################################################
 
+#    main()
+
 #-----------------------------------------------------
 # main         : 初期設定、会話、終了処理            |
 # 入力         : なし                                |
@@ -114,10 +116,9 @@
 #-----------------------------------------------------
 def main()
 
-    ErrorBreakMode(0, 0, 0)
+    errorbreakmode(0, 0, 0)
 
-    # データファイル名
-$dat_file = "jeliza.dat"
+    $dat_file = "jeliza.dat"            # データファイル名
 
     タイトル()
     初期設定()
@@ -141,7 +142,7 @@ end
 #-----------------------------------------------------
 def タイトル()
 
-    Message("Ｊ・ＥＬＩＺＡ", 0)
+    message("Ｊ・ＥＬＩＺＡ", 0)
 
 end
 
@@ -159,50 +160,48 @@ def 初期設定()
     if existfile($dat_file) then
         $知識ファイル名 = $dat_file
     else
-        gof = GETOPTIONFILE()
-        path = BREAKDOWNPATH(gof["マクロ"])
+        gof = getoptionfile()
+        path = breakdownpath(gof["マクロ"])
         drive = path["drive"]
         dir = path["directory"]
-        $知識ファイル名 = drive + dir + $dat_file
+        $知識ファイル名 = drive & dir & $dat_file
     end
 
     確定 = false
-    if Exact($知識ファイル名, "") != true then
-        Guidance("知識ファイル = " + $知識ファイル名)
-        case Alert("知識ファイル = " + $知識ファイル名)
+    if exact($知識ファイル名, "") != true then
+        guidance("知識ファイル = " & $知識ファイル名)
+        case alert("知識ファイル = " & $知識ファイル名)
             when 1 then
                 確定 = true
             when 2 then
                 確定 = false
             else
-                Guidance("")
-                # エスケープ終了
-STOP()
+                guidance("")
+                stop()            # エスケープ終了
         end
-        Guidance("")
+        guidance("")
     end
 
     if 確定 != true then
-        Guidance("知識ファイルを指定してください")
-        $知識ファイル名 = InputFile("", "*.dat")
-        Guidance("")
-        if Exact($知識ファイル名, "") == true then
-            STOP()
+        guidance("知識ファイルを指定してください")
+        $知識ファイル名 = inputfile("", "*.dat")
+        guidance("")
+        if exact($知識ファイル名, "") == true then
+            stop()
         end
     end
 
-    Guidance("知識ファイルに学習結果を保存")
-    case Alert("会話学習する")
+    guidance("知識ファイルに学習結果を保存")
+    case alert("会話学習する")
         when 1 then
             $学習 = true
         when 2 then
             $学習 = false
         else
-            Guidance("")
-            # エスケープ終了
-STOP()
+            guidance("")
+            stop()            # エスケープ終了
     end
-    Guidance("")
+    guidance("")
 
 end
 
@@ -229,9 +228,9 @@ def 履歴登録(文)
 
     置換 = 1
     最短長 = 100
-    if Len(文) >= 8 then
+    if len(文) >= 8 then
         (1).upto($履歴最大数) do |添字|
-            長さ = Len($履歴[添字])
+            長さ = len($履歴[添字])
             if 長さ < 最短長 then
                 置換 = 添字
                 最短長 = 長さ
@@ -251,7 +250,7 @@ def 履歴出力()
 
     有効数 = 0
     (1).upto($履歴最大数) do |数|
-        if Exact($履歴[数], "") == false then
+        if exact($履歴[数], "") == false then
             有効数 = 有効数 + 1
             有効[有効数] = 数
         end
@@ -264,8 +263,7 @@ def 履歴出力()
     else
         _prr_result = "誰がなんと言おうと、カレーが好きだ"
     end
-    # 必要？
-Remove(有効)
+    remove(有効)  # 必要？
 
 _prr_result
 end
@@ -291,25 +289,25 @@ def 会話処理()
     $出力文 = 最初の挨拶()
 
     while true do
-	Remove($入力文)
+	remove($入力文)
         $入力文 = 文字入力($出力文)
-        if !IsBlank($入力文) then
-            $入力文 = Zen(Clean(Trim($入力文)))
+        if !isblank($入力文) then
+            $入力文 = zen(clean(trim($入力文)))
         end
 
-        if IsBlank($入力文) || 最後の挨拶？($入力文) == true then
+        if isblank($入力文) || 最後の挨拶？($入力文) == true then
             $出力文 = 最後の挨拶()
-            Message($出力文)
+            message($出力文)
             break
         elsif 正数乱数(100) == 50 then
-            $出力文 = "ちょっと都合が悪いんで。" + 最後の挨拶()
-            Message($出力文)
+            $出力文 = "ちょっと都合が悪いんで。" & 最後の挨拶()
+            message($出力文)
             break
         elsif $繰り返し数 > 15 then
-            $出力文 = "同じことばっかり言って。" + 最後の挨拶()
-            Message($出力文)
+            $出力文 = "同じことばっかり言って。" & 最後の挨拶()
+            message($出力文)
             break
-        elsif Exact($入力文, "") == true then
+        elsif exact($入力文, "") == true then
             $出力文 = 空文返答()
         elsif 繰り返し？() == true then
             $出力文 = 繰り返し返答($入力文)
@@ -335,11 +333,11 @@ end
 #-----------------------------------------------------
 def 最初の挨拶()
 
-    if Exist($知識["＠最初の挨拶"]) == false then
+    if exist($知識["＠最初の挨拶"]) == false then
         $知識["＠最初の挨拶"][1] = "こんにちは"
         添字 = 1
     else
-        個数 = Size($知識["＠最初の挨拶"])
+        個数 = size($知識["＠最初の挨拶"])
         添字 = 正数乱数(個数)
     end
     _prr_result = $知識["＠最初の挨拶"][添字]
@@ -354,11 +352,11 @@ end
 #-----------------------------------------------------
 def 最後の挨拶()
 
-    if Exist($知識["＠最後の挨拶"]) == false then
+    if exist($知識["＠最後の挨拶"]) == false then
         $知識["＠最後の挨拶"][1] = "さようなら"
         添字 = 1
     else
-        個数 = Size($知識["＠最後の挨拶"])
+        個数 = size($知識["＠最後の挨拶"])
         添字 = 正数乱数(個数)
     end
     _prr_result = $知識["＠最後の挨拶"][添字]
@@ -374,13 +372,13 @@ end
 def 最後の挨拶？(挨拶)
 
     出力 = false
-    if Find("ばいばい", 挨拶) > 0 || Find("バイバイ", 挨拶) > 0 || Find("さよなら", 挨拶) > 0 || Find("さようなら", 挨拶) > 0 then
+    if find("ばいばい", 挨拶) > 0 || find("バイバイ", 挨拶) > 0 || find("さよなら", 挨拶) > 0 || find("さようなら", 挨拶) > 0 then
         出力 = true
     end
 
-    if 出力 == false && Exist($知識["＠最後の挨拶"]) == true then
+    if 出力 == false && exist($知識["＠最後の挨拶"]) == true then
         for 要素 in $知識["＠最後の挨拶"] do
-            if Exact(挨拶, 要素, 4) == true then
+            if exact(挨拶, 要素, 4) == true then
                 出力 = true
                 break
             end
@@ -404,13 +402,13 @@ def 繰り返し返答(文)
     数 = 正数乱数(4)
 
     if 数 > 3 then
-        _prr_result = "こっちも『" + 文 + "』"
+        _prr_result = "こっちも『" & 文 & "』"
     else
-        if Exist($知識["＠繰り返し"]) == false then
+        if exist($知識["＠繰り返し"]) == false then
             $知識["＠繰り返し"][1] = "同じことを言うな"
             添字 = 1
         else
-            個数 = Size($知識["＠繰り返し"])
+            個数 = size($知識["＠繰り返し"])
             添字 = 正数乱数(個数)
         end
         _prr_result = $知識["＠繰り返し"][添字]
@@ -427,11 +425,11 @@ end
 def 繰り返し？()
 
     _prr_result = false
-    if $前入力文 != nil && Exact($入力文, $前入力文, 4) == true then
+    if $前入力文 != nil && exact($入力文, $前入力文, 4) == true then
         _prr_result = true
     else
         (1).upto($履歴最大数) do |添字|
-            if Exact($履歴[$入力文][添字], 4) == true then
+            if exact($履歴[$入力文][添字], 4) == true then
                 _prr_result = true
                 break
             end
@@ -452,55 +450,55 @@ def 空文返答()
     数 = 正数乱数(20)
     case 数
         when 1 then
-            _prr_result = "確か「" + 履歴出力() + "」って言ってたよ"
+            _prr_result = "確か「" & 履歴出力() & "」って言ってたよ"
         when 2 then
-            _prr_result = "「" + 履歴出力() + "」って言ったの覚えてる？"
+            _prr_result = "「" & 履歴出力() & "」って言ったの覚えてる？"
         when 3 then
-            _prr_result = "この前の「" + 履歴出力() + "」って発言は納得いかんな"
+            _prr_result = "この前の「" & 履歴出力() & "」って発言は納得いかんな"
         when 4 then
-            _prr_result = "「" + 履歴出力() + "」って発言を詳しく聞かせてよ"
+            _prr_result = "「" & 履歴出力() & "」って発言を詳しく聞かせてよ"
         when 5 then
-            数字 = Zen(LeftB(ThisTime(), 2))
-            if Code(数字) == Code("０") then
-                数字 = RightB(数字, 2)
+            数字 = zen(leftb(thistime(), 2))
+            if code(数字) == code("０") then
+                数字 = rightb(数字, 2)
             end
-            _prr_result = "もう" + 数字 + "時か"
+            _prr_result = "もう" & 数字 & "時か"
         when 6 then
-            _prr_result = "今年は西暦" + Zen(LeftB(ThisDate(), 4)) + "年です"
+            _prr_result = "今年は西暦" & zen(leftb(thisdate(), 4)) & "年です"
         when 7 then
-            数字 = Zen(MidB(ThisDate(), 6, 2))
-            if Code(数字) == Code("０") then
-                数字 = RightB(数字, 2)
+            数字 = zen(midb(thisdate(), 6, 2))
+            if code(数字) == code("０") then
+                数字 = rightb(数字, 2)
             end
-            _prr_result = 数字 + "月は忙しいな"
+            _prr_result = 数字 & "月は忙しいな"
         when 8 then
-            数字 = Zen(RightB(ThisDate(), 2))
-            if Code(数字) == Code("０") then
-                数字 = RightB(数字, 2)
+            数字 = zen(rightb(thisdate(), 2))
+            if code(数字) == code("０") then
+                数字 = rightb(数字, 2)
             end
-            _prr_result = "あれ、今日は" + 数字 + "日なのか"
+            _prr_result = "あれ、今日は" & 数字 & "日なのか"
         when 9 then
             キー = キー出力()
-            _prr_result = "ところであなた、「" + キー + "」って知ってる？"
+            _prr_result = "ところであなた、「" & キー & "」って知ってる？"
             $質問中 = true
         when 10 then
             キー = キー出力()
-            _prr_result = "暇そうだから、「" + キー + "」って教えて"
+            _prr_result = "暇そうだから、「" & キー & "」って教えて"
             $質問中 = true
         when 10 then
             キー = キー出力()
-            _prr_result = "お願いだから、「" + キー + "」を説明して"
+            _prr_result = "お願いだから、「" & キー & "」を説明して"
             $質問中 = true
         when 11 then
             キー = キー出力()
-            _prr_result = "「" + キー + "」について詳しく知りたいな"
+            _prr_result = "「" & キー & "」について詳しく知りたいな"
             $質問中 = true
         else
-            if Exist($知識["＠空文"]) == false then
+            if exist($知識["＠空文"]) == false then
                 $知識["＠空文"][1] = "何か言ってもらわないと"
                 添字 = 1
             else
-                個数 = Size($知識["＠空文"])
+                個数 = size($知識["＠空文"])
                 添字 = 正数乱数(個数)
             end
             _prr_result = $知識["＠空文"][添字]
@@ -518,11 +516,11 @@ def 会話学習(返答)
 
     (1).upto($注目語数) do |添字|
         キー = $注目語[添字]
-        if Exist($知識[キー]) == true then
+        if exist($知識[キー]) == true then
             既存 = false
-            要素数 = Size($知識[キー])
+            要素数 = size($知識[キー])
             (1).upto(要素数) do |番号|
-                if Exact($知識[返答][キー][番号], 4) == true then
+                if exact($知識[返答][キー][番号], 4) == true then
                     既存 = true
                     break
                 end
@@ -544,11 +542,11 @@ end
 #-----------------------------------------------------
 def 注目語決定()
 
-    Remove($注目語)
+    remove($注目語)
     $注目語数 = 0
     $最重要 = 0
 
-    if $形態素数 <= 1 || Len($入力文) <= 5 then
+    if $形態素数 <= 1 || len($入力文) <= 5 then
         $注目語[1] = $入力文
         $注目語数 = 1
         $最重要 = 1
@@ -556,16 +554,16 @@ def 注目語決定()
         $注目語数 = 0
         $最重要 = 0
         (1).upto($形態素数) do |添字|
-            字種 = Code($形態素[添字])
+            字種 = code($形態素[添字])
             if 字種 == 1 || 字種 == 2 || 字種 == 4 then
                 $注目語数 = $注目語数 + 1
                 $注目語[$注目語数] = $形態素[添字]
                 if $注目語数 == 1 then
                     $最重要 = 1
-                    最大長 = Len($注目語[$最重要])
+                    最大長 = len($注目語[$最重要])
                 else
-                    長さ = Len($注目語[$注目語数])
-                    if 長さ > 最大長 || 長さ == 最大長 && 字種(Code($注目語[$注目語数])) > 字種(Code($注目語[$最重要])) then
+                    長さ = len($注目語[$注目語数])
+                    if 長さ > 最大長 || 長さ == 最大長 && 字種(code($注目語[$注目語数])) > 字種(code($注目語[$最重要])) then
                         $最重要 = $注目語数
                         最大長 = 長さ
                     end
@@ -589,77 +587,77 @@ end
 def 出力文決定()
 
     キー = $注目語[$最重要]
-    if Exist($知識[キー]) == false then
+    if exist($知識[キー]) == false then
         数 = 正数乱数(35)
         case 数
             when 1 then
-                $出力文 = "ところで、「" + 履歴出力() + "」って言ったよね"
+                $出力文 = "ところで、「" & 履歴出力() & "」って言ったよね"
                 $質問中 = false
             when 2 then
-                $出力文 = "さっきこんな事を言ったね：「" + 履歴出力() + "」"
+                $出力文 = "さっきこんな事を言ったね：「" & 履歴出力() & "」"
                 $質問中 = false
             when 3 then
-                $出力文 = "「" + 履歴出力() + "」って発言は納得いかんな"
+                $出力文 = "「" & 履歴出力() & "」って発言は納得いかんな"
                 $質問中 = false
             when 4 then
-                $出力文 = "「" + キー + "」って何なの？"
+                $出力文 = "「" & キー & "」って何なの？"
                 $質問中 = true
             when 5 then
-                $出力文 = "「" + キー + "」について教えて下さい"
+                $出力文 = "「" & キー & "」について教えて下さい"
                 $質問中 = true
             when 6 then
-                $出力文 = "「" + キー + "」は知らないな"
+                $出力文 = "「" & キー & "」は知らないな"
                 $質問中 = true
             when 7 then
-                $出力文 = "「" + キー + "」の意味を教えて"
+                $出力文 = "「" & キー & "」の意味を教えて"
                 $質問中 = true
             when 8 then
                 キー = キー出力()
-                $出力文 = "ところで「" + キー + "」って何なの？"
+                $出力文 = "ところで「" & キー & "」って何なの？"
                 $質問中 = true
             when 9 then
                 キー = キー出力()
-                $出力文 = "あれっ、「" + キー + "」って何だったっけ？"
+                $出力文 = "あれっ、「" & キー & "」って何だったっけ？"
                 $質問中 = true
             when 10 then
                 キー = キー出力()
-                $出力文 = "話は変わるけど、「" + キー + "」って言葉が気になって"
+                $出力文 = "話は変わるけど、「" & キー & "」って言葉が気になって"
                 $質問中 = true
             when 11 then
                 キー = キー出力()
-                $出力文 = "君、「" + キー + "」を説明しなさい"
+                $出力文 = "君、「" & キー & "」を説明しなさい"
                 $質問中 = true
             when 12 then
-                数字 = Zen(LeftB(ThisTime(), 2))
-                if Code(数字) == Code("０") then
-                    数字 = RightB(数字, 2)
+                数字 = zen(leftb(thistime(), 2))
+                if code(数字) == code("０") then
+                    数字 = rightb(数字, 2)
                 end
-                $出力文 = "今は" + 数字 + "時だね"
+                $出力文 = "今は" & 数字 & "時だね"
                 $質問中 = false
             when 13 then
-                数字 = Zen(LeftB(ThisDate(), 4))
-                $出力文 = "確か今年は" + 数字 + "年だね"
+                数字 = zen(leftb(thisdate(), 4))
+                $出力文 = "確か今年は" & 数字 & "年だね"
                 $質問中 = false
             when 14 then
-                数字 = Zen(MidB(ThisDate(), 6, 2))
-                if Code(数字) == Code("０") then
-                    数字 = RightB(数字, 2)
+                数字 = zen(midb(thisdate(), 6, 2))
+                if code(数字) == code("０") then
+                    数字 = rightb(数字, 2)
                 end
-                $出力文 = "ところで、今月は" + 数字 + "月だね"
+                $出力文 = "ところで、今月は" & 数字 & "月だね"
                 $質問中 = false
             when 15 then
-                数字 = Zen(RightB(ThisDate(), 2))
-                if Code(数字) == Code("０") then
-                    数字 = RightB(数字, 2)
+                数字 = zen(rightb(thisdate(), 2))
+                if code(数字) == code("０") then
+                    数字 = rightb(数字, 2)
                 end
-                $出力文 = "今日は" + 数字 + "日だね"
+                $出力文 = "今日は" & 数字 & "日だね"
                 $質問中 = false
             else
                 $出力文 = 受け流し出力()
                 $質問中 = true
         end
     else
-        個数 = Size($知識[キー])
+        個数 = size($知識[キー])
         添字 = 正数乱数(個数)
         $出力文 = $知識[キー][添字]
         $質問中 = false
@@ -674,11 +672,11 @@ end
 #-----------------------------------------------------
 def 受け流し出力()
 
-    if Exist($知識["＠受け流し"]) == false then
+    if exist($知識["＠受け流し"]) == false then
         $知識["＠受け流し"][1] = "そうだったのか"
         添字 = 1
     else
-        個数 = Size($知識["＠受け流し"])
+        個数 = size($知識["＠受け流し"])
         添字 = 正数乱数(個数)
     end
     _prr_result = $知識["＠受け流し"][添字]
@@ -694,10 +692,10 @@ end
 def キー出力()
 
     最小応答数 = 100
-    添字配列 = ArrayIndex($知識)
+    添字配列 = arrayindex($知識)
     for キー in 添字配列 do
-        if Code(キー) != Code("＠") then
-            応答数 = Size($知識[キー])
+        if code(キー) != code("＠") then
+            応答数 = size($知識[キー])
             if 応答数 < 最小応答数 then
                 候補 = キー
                 最小応答数 = 応答数
@@ -705,7 +703,7 @@ def キー出力()
         end
     end
 
-    Remove($注目語)
+    remove($注目語)
     $注目語数 = 1
     $最重要 = 1
     if 候補 != nil then
@@ -730,10 +728,10 @@ end
 #-----------------------------------------------------
 def 知識読込(名前)
 
-    Guidance("知識ファイル " + 名前 + " を読込中")
+    guidance("知識ファイル " & 名前 & " を読込中")
     ファイル = 1
     番号 = 1
-    Open(ファイル, 名前, "INPUT")
+    open(ファイル, 名前, "INPUT")
     if missing(ファイル) == true then
         $知識["＠受け流し"][1] = "はいはい"
         $知識["＠最初の挨拶"][1] = "こんにちは"
@@ -742,16 +740,15 @@ def 知識読込(名前)
         $知識["＠空文"][1] = "黙ってないで"
     else
         while missing(ファイル) != true do
-            LineInput(ファイル, 文字列)
-            コード = Code(文字列)
-            if コード == Code(" ") || コード == Code("　") then
+            lineinput(ファイル, 文字列)
+            コード = code(文字列)
+            if コード == code(" ") || コード == code("　") then
                 反応 = true
             else
                 反応 = false
             end
-            # DOSの1ah
-文字列 = Zen(Clean(Trim(文字列)))
-            if Code(文字列) != Code("") then
+            文字列 = zen(clean(trim(文字列)))   # DOSの1ah
+            if code(文字列) != code("") then
                 if 反応 == true then
                     $知識[キー][番号] = 文字列
                     番号 = 番号 + 1
@@ -763,7 +760,7 @@ def 知識読込(名前)
         end
         close(ファイル)
     end
-    Guidance("")
+    guidance("")
 
 end
 
@@ -774,22 +771,22 @@ end
 #-----------------------------------------------------
 def 知識保存(名前)
 
-    Guidance("知識ファイル " + 名前 + " に保存中")
+    guidance("知識ファイル " & 名前 & " に保存中")
     ファイル = 1
-    Create(ファイル, 名前, "NEWOLD")
+    create(ファイル, 名前, "NEWOLD")
     if missing(ファイル) == true then
         message("知識が保存できませんでした")
     else
-        添字配列 = ArrayIndex($知識)
+        添字配列 = arrayindex($知識)
         for キー in 添字配列 do
-            LinePrint(ファイル, キー)
+            lineprint(ファイル, キー)
             for 反応 in $知識[キー] do
-                LinePrint(ファイル, "　" + 反応)
+                lineprint(ファイル, "　" & 反応)
             end
         end
         close(ファイル)
     end
-    Guidance("")
+    guidance("")
 
 end
 
@@ -799,11 +796,11 @@ end
 # 出力         : なし                                |
 #-----------------------------------------------------
 def 知識表示()
-    添字配列 = ArrayIndex($知識)
+    添字配列 = arrayindex($知識)
     for キー in 添字配列 do
         番号 = 1
         for 反応 in $知識[キー] do
-            message("(" + キー + "," + 番号 + ") -> " + 反応)
+            message("(" & キー & "," & 番号 & ") -> " & 反応)
             番号 = 番号 + 1
         end
     end
@@ -822,19 +819,19 @@ end
 #-----------------------------------------------------
 def 字種区切り(入力)
 
-    Remove($形態素)
+    remove($形態素)
     $形態素数 = 1
     出力 = ""
     位置 = 1
-    文字 = Mid(入力, 位置, 1)
-    コード = Code(文字)
+    文字 = mid(入力, 位置, 1)
+    コード = code(文字)
     現種類 = 字種(コード)
     前種類 = -1
     while 現種類 != 0 do
         if 前種類 == -1 then
             出力 = 文字
         elsif 現種類 == 前種類 then
-            出力 = 出力 + 文字
+            出力 = 出力 & 文字
         else
             $形態素[$形態素数] = 出力
             $形態素数 = $形態素数 + 1
@@ -842,8 +839,8 @@ def 字種区切り(入力)
         end
         前種類 = 現種類
         位置 = 位置 + 1
-        文字 = Mid(入力, 位置, 1)
-        コード = Code(文字)
+        文字 = mid(入力, 位置, 1)
+        コード = code(文字)
         現種類 = 字種(コード)
     end
     if 前種類 != -1 then
@@ -862,7 +859,7 @@ end
 #-----------------------------------------------------
 def 字種(コード)
 
-    if コード == Code("") then
+    if コード == code("") then
         _prr_result = 0
     elsif 漢字？(コード) == true then
         _prr_result = 1
@@ -886,7 +883,7 @@ end
 #-----------------------------------------------------
 def 漢字？(コード)
 
-    if コード >= Code("亜") && コード <= Code("龠") then
+    if コード >= code("亜") && コード <= code("龠") then
         _prr_result = true
     else
         _prr_result = false
@@ -902,7 +899,7 @@ end
 #-----------------------------------------------------
 def カタカナ？(コード)
 
-    if コード >= Code("ァ") && コード <= Code("ヶ") || コード == Code("ー") then
+    if コード >= code("ァ") && コード <= code("ヶ") || コード == code("ー") then
         _prr_result = true
     else
         _prr_result = false
@@ -918,7 +915,7 @@ end
 #-----------------------------------------------------
 def ひらがな？(コード)
 
-    if コード >= Code("ぁ") && コード <= Code("ん") then
+    if コード >= code("ぁ") && コード <= code("ん") then
         _prr_result = true
     else
         _prr_result = false
@@ -934,7 +931,7 @@ end
 #-----------------------------------------------------
 def 英数字？(コード)
 
-    if コード >= Code("０") && コード <= Code("９") || コード >= Code("Ａ") && コード <= Code("ｚ") then
+    if コード >= code("０") && コード <= code("９") || コード >= code("Ａ") && コード <= code("ｚ") then
         _prr_result = true
     else
         _prr_result = false
@@ -954,7 +951,7 @@ end
 # 出力         : １〜最大値までの整数                |
 #-----------------------------------------------------
 def 正数乱数(最大値)
-    数 = ThisMinute() + ThisSecond()
+    数 = thisminute() & thissecond()
     _prr_result = 数 % 最大値 + 1
 _prr_result
 end
@@ -964,8 +961,8 @@ end
 # 入力         : なし                                |
 # 出力         : 現在秒の文字列  "05","59","00"      |
 #-----------------------------------------------------
-def ThisSecond()
-    _prr_result = RightB(ThisTime(), 2)
+def thissecond()
+    _prr_result = rightb(thistime(), 2)
 _prr_result
 end
 
@@ -974,8 +971,8 @@ end
 # 入力         : なし                                |
 # 出力         : 現在分の文字列  "15","09","41"      |
 #-----------------------------------------------------
-def ThisMinute()
-    _prr_result = MidB(ThisTime(), 4, 2)
+def thisminute()
+    _prr_result = midb(thistime(), 4, 2)
 _prr_result
 end
 

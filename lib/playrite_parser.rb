@@ -25,7 +25,7 @@ class PlayRiteParser
 
   def lookup_vartop(ident)
     case ident
-    when /^%/ then ident.gsub(/^%/, '')
+    when /^%/ then ident.gsub(/^%/, '').downcase
     when /^\$/ then ident
     end
   end
